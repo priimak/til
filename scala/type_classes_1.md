@@ -88,8 +88,8 @@ def numberOfPixels[A: ImageDimensions](image: A): Int = {
 }
 ```
 This is known as _context bound syntax_ [[5](#ref5)]. 
-And it means that type `A` that can be passed to this function can only be such for which there exist an
-implicit value of type `ImageDimensions[A]`. Internally in the function to obtain this value we have to call 
+It means that type `A` that can be passed to this function can only be such for which there exist an
+implicit value of type `ImageDimensions[A]`. Internally in the function body to obtain this value we have to call 
 `implicitly[ImageDimensions[A]]`.
 
 References
