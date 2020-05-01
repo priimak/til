@@ -22,7 +22,7 @@ case class TIFFImage(private val x: Int, private val y: Int) {
 This class, however, unlike `JPEGImage` does not provide direct access to `width`
 and `height` of the image. Instead it provides method `dimensions()`.
 
-The the question is can we modify our code and method `numberOfPixels(...)` in particular 
+Thus the question is can we modify our code and method `numberOfPixels(...)` in particular 
 so that it can accept either of these two classes. This is particularly important
 because we are unlikely to modify these external libraries and thus have to work around
 whatever functionality they provide. We also want to preserve compile-time type safety
