@@ -8,7 +8,7 @@ Consider a case where we use an external library that provides objects `JPEGImag
 ```scala
 case class JPEGImage(width: Int, height: Int)
 ```
-To use these objects we have a method `numberOfPixels(JPEGImage)` that accepts
+In our we have a method `numberOfPixels(JPEGImage)` that accepts
 instances of this class and computes total number of pixels
 ```scala
 def numberOfPixels(image: JPEGImage): Int =  image.width * image.height
@@ -43,7 +43,7 @@ properties_. Scala does not have a dedicated syntax for type classes, however, w
 _implicits_ and _implict scope_ [[4](#ref4)] to emulate such behaviour.
 
 In Scala, type class is defined as trait that posses certain functions and an implicit 
-objects or values that instances of this trait for all types that are made to be a member 
+objects or values that are instances of this trait for all types that are made to be members 
 of this type class.
 
 In our case we define type class `ImageDimensions` trait with a function that for a given
@@ -116,7 +116,7 @@ def numberOfPixels[A: ImageDimensions](image: A): Int =
 Additionally we can coerce both `JPEGImage` and `TIFFImage` classes into another class that 
 has method `getDimensions()` by introducing implicit class
 ```scala
-implicit class ImageDimensions[A: ImageDimensions](image: A) {
+implicit class ImageDimensionsOps[A: ImageDimensions](image: A) {
   def getDimensions(): java.awt.Dimension = ImageDimensions[A].getDimensions(image)
 }
 ```
