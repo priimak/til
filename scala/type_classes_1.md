@@ -4,6 +4,7 @@ Type Classes in Scala
 Motivation
 ----------
 Consider a case where you use an external library that provides objects `JPEGImage`
+<a id="JPEGImage"></a>
 ```scala
 case class JPEGImage(width: Int, height: Int)
 ```
@@ -14,6 +15,7 @@ def numberOfPixels(image: JPEGImage): Int =  image.width * image.height
 ```
 Now you want to add ability to use tiff images in your application. You bring another
 library that provides class `TIFFImage`
+<a id="TIFFImage"></a>
 ```scala
 case class TIFFImage(private val x: Int, private val y: Int) {
   def dimensions(): java.awt.Dimension = new java.awt.Dimension(x, y)
@@ -90,7 +92,65 @@ def numberOfPixels[A: ImageDimensions](image: A): Int = {
 This is known as _context bound syntax_ [[5](#ref5)]. 
 It means that type `A` that can be passed to this function can only be such for which there exist an
 implicit value of type `ImageDimensions[A]`. Internally in the function body to obtain this value we have to call 
-`implicitly[ImageDimensions[A]]`.
+`implicitly[ImageDimensions[A]]` which pull instance of `ImageDimensions[A]` from implicit context. 
+
+This can be simplified though by providing easier access to the implicit instance of `ImageDimensions[A]` by adding
+`apply(...)` method to the `ImageDimensions` companion object
+```scala
+object ImageDimensions {
+  ...
+  def apply[A](implicit imageDimensions: ImageDimensions[A]): ImageDimensions[A] = imageDimensions
+}
+```
+Then function `numberOfPixels(...)` can be rewritten like so
+```scala
+def numberOfPixels[A: ImageDimensions](image: A): Int =
+  ImageDimensions[A].getDimensions(image).width * ImageDimensions[A].getDimensions(image).height
+```
+Additionally we can coerce both `JPEGImage` and `TIFFImage` classes into another class that 
+has method `getDimensions()` by introducing implicit class
+```scala
+implicit class ImageOps[A: ImageDimensions](image: A) {
+  def getDimensions(): java.awt.Dimension = ImageDimensions[A].getDimensions(image)
+}
+```
+Then we can call method `getDimensions()` on the original image classes as if they have this method
+```scala
+val d = TIFFImage(800, 600).getDimensions()
+```
+
+Complete Example
+----------------
+Below is a complete code in the `xyz.priimak.example.image` package that defines this type class.
+We assume that we already have classes [JPEGImage](#JPEGImage) and [TIFFImage](#TIFFImage) provided 
+by perhaps some other third-party libraries.
+```scala
+package xyz.priimak.example
+
+import java.awt.Dimension
+
+package object image {
+  trait ImageDimensions[A] {
+    def getDimensions(image: A): java.awt.Dimension
+  }
+
+  implicit class ImageOps[A: ImageDimensions](image: A) {
+    def getDimensions(): java.awt.Dimension = ImageDimensions[A].getDimensions(image)
+  }
+
+  object ImageDimensions {
+    implicit object JPEGImageDimensions extends ImageDimensions[JPEGImage] {
+      override def getDimensions(image: JPEGImage): Dimension = new Dimension(image.width, image.height)
+    }
+
+    implicit object TIFFImageDimensions extends ImageDimensions[TIFFImage] {
+      override def getDimensions(image: TIFFImage): Dimension = image.dimensions()
+    }
+
+    def apply[A](implicit imageDimensions: ImageDimensions[A]): ImageDimensions[A] = imageDimensions
+  }
+}
+```
 
 References
 ----------
