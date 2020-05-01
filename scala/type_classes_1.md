@@ -3,45 +3,51 @@ Type Classes in Scala
 
 Motivation
 ----------
-Consider a case where you use an external library that provides objects `JPEGImage`
+Consider a case where we use an external library that provides objects `JPEGImage`
 <a id="JPEGImage"></a>
 ```scala
 case class JPEGImage(width: Int, height: Int)
 ```
-To use these objects you have a method `numberOfPixels(JPEGImage)` that accepts
+To use these objects we have a method `numberOfPixels(JPEGImage)` that accepts
 instances of this class and computes total number of pixels
 ```scala
 def numberOfPixels(image: JPEGImage): Int =  image.width * image.height
 ```
-Now you want to add ability to use tiff images in your application. You bring another
-library that provides class `TIFFImage`
+Now we bring another library that provides class `TIFFImage` which we want to 
+use along side with `JPEGImage`.
 <a id="TIFFImage"></a>
 ```scala
 case class TIFFImage(private val x: Int, private val y: Int) {
   def dimensions(): java.awt.Dimension = new java.awt.Dimension(x, y)
 }
 ```
-This class, however, unlike `JPEGImage` does not provide direct access to `width`
+These two classes do not share a common ancestor besides maybe `Any` or `java.lang.Object`.
+Additionally `TIFFImage` unlike `JPEGImage` does not provide direct access to `width`
 and `height` of the image. Instead it provides method `dimensions()`.
 
 Thus the question is can we modify our code and method `numberOfPixels(...)` in particular 
-so that it can accept either of these two classes. This is particularly important
+so that it can accept either one of these two classes. This is particularly important
 because we are unlikely to modify these external libraries and thus have to work around
 whatever functionality they provide. We also want to preserve compile-time type safety
 of our code, which means that we do not want `numberOfPixels(...)` to accept arbitrary
 objects and then use reflection to find instance of what class was actually passed. Such
-code would lead to runtime exceptions which we do not want either.
+code would lead to runtime exceptions which we obviously would like to avoid.
 
 Type Classes
 -----------------------------
-Type Classes offer a solution of the above mentioned problem with minimal additional 
+Type classes offer a solution of the above mentioned problem with minimal additional 
 code [[1](#ref1),[2](#ref2),[3](#ref3)].
-Word "_Classes_" here refer to the concept that several very different types can be made
+Word "_Classes_" here refers to the concept that several very different types can be made
 to belong to a certain class of objects, i.e. a _class of things that posses certain common
 properties_. Scala does not have a dedicated syntax for type classes, however, we can use
 _implicits_ and _implict scope_ [[4](#ref4)] to emulate such behaviour.
 
-In our case a trait that defines function that for a given image can provide us its dimension is
+In Scala, type class is defined as trait that posses certain functions and an implicit 
+objects or values that instances of this trait for all types that are made to be a member 
+of this type class.
+
+In our case we define type class `ImageDimensions` trait with a function that for a given
+image can provide us its dimensions
 ```scala
 trait ImageDimensions[A] {
   def getDimensions(image: A): java.awt.Dimension
@@ -63,7 +69,7 @@ object ImageDimensions {
 ```
 We place them inside of companion object `ImageDimensions` which leads to importing
 of `JPEGImageDimensions` and `TIFFImageDimensions` into implicit scope every
-time when `ImageDimensions` is imported
+time `ImageDimensions` is imported
 ```scala
 import ImageDimensions
 ```
@@ -92,10 +98,10 @@ def numberOfPixels[A: ImageDimensions](image: A): Int = {
 This is known as _context bound syntax_ [[5](#ref5)]. 
 It means that type `A` that can be passed to this function can only be such for which there exist an
 implicit value of type `ImageDimensions[A]`. Internally in the function body to obtain this value we have to call 
-`implicitly[ImageDimensions[A]]` which pull instance of `ImageDimensions[A]` from implicit context. 
+`implicitly[ImageDimensions[A]]` which pulls instance of `ImageDimensions[A]` from implicit context. 
 
-This can be simplified though by providing easier access to the implicit instance of `ImageDimensions[A]` by adding
-`apply(...)` method to the `ImageDimensions` companion object
+This can be simplified farther by providing easier access to the implicit instance of `ImageDimensions[A]`.
+ That is done by adding method `apply(...)` to the `ImageDimensions` companion object
 ```scala
 object ImageDimensions {
   ...
@@ -110,7 +116,7 @@ def numberOfPixels[A: ImageDimensions](image: A): Int =
 Additionally we can coerce both `JPEGImage` and `TIFFImage` classes into another class that 
 has method `getDimensions()` by introducing implicit class
 ```scala
-implicit class ImageOps[A: ImageDimensions](image: A) {
+implicit class ImageDimensions[A: ImageDimensions](image: A) {
   def getDimensions(): java.awt.Dimension = ImageDimensions[A].getDimensions(image)
 }
 ```
@@ -134,7 +140,7 @@ package object image {
     def getDimensions(image: A): java.awt.Dimension
   }
 
-  implicit class ImageOps[A: ImageDimensions](image: A) {
+  implicit class ImageDimensionsOps[A: ImageDimensions](image: A) {
     def getDimensions(): java.awt.Dimension = ImageDimensions[A].getDimensions(image)
   }
 
