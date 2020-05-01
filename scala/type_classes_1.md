@@ -8,7 +8,7 @@ Consider a case where we use an external library that provides objects `JPEGImag
 ```scala
 case class JPEGImage(width: Int, height: Int)
 ```
-In our we have a method `numberOfPixels(JPEGImage)` that accepts
+In our code we have a method `numberOfPixels(JPEGImage)` that accepts
 instances of this class and computes total number of pixels
 ```scala
 def numberOfPixels(image: JPEGImage): Int =  image.width * image.height
