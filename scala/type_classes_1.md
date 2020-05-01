@@ -94,7 +94,7 @@ implicit value of type `ImageDimensions[A]`. Internally in the function to obtai
 
 References
 ----------
-1.<a href="#ref1">&nbsp;</a>"[_How to make ad-hoc polymorphism less ad hoc_](http://homepages.inf.ed.ac.uk/wadler/papers/class/class.ps)" - 
+1. <a id="ref1"></a>"[_How to make ad-hoc polymorphism less ad hoc_](http://homepages.inf.ed.ac.uk/wadler/papers/class/class.ps)" - 
     original article that introduced type-classes in Haskell.
 2. "[_Tutorial on typeclasses in Scala_](https://scalac.io/typeclasses-in-scala/)" -  another good tutorial 
 on type classes in Scala.
