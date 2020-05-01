@@ -39,7 +39,7 @@ to belong to a certain class of objects, i.e. a _class of things that posses cer
 properties_. Scala does not have a dedicated syntax for type classes, however, we can use
 _implicits_ and _implict scope_ [[4](#ref4)] to emulate such behaviour.
 
-In our case a trait that defines function that for a given image can provide us its dimension
+In our case a trait that defines function that for a given image can provide us its dimension is
 ```scala
 trait ImageDimensions[A] {
   def getDimensions(image: A): java.awt.Dimension
@@ -61,7 +61,7 @@ object ImageDimensions {
 ```
 We place them inside of companion object `ImageDimensions` which leads to importing
 of `JPEGImageDimensions` and `TIFFImageDimensions` into implicit scope every
-time when `ImageOps` is imported
+time when `ImageDimensions` is imported
 ```scala
 import ImageDimensions
 ```
