@@ -9,7 +9,6 @@ case class JPEGImage(width: Int, height: Int)
 ```
 To use these objects you have a method `numberOfPixels(JPEGImage)` that accepts
 instances of this class and computes total number of pixels
-so
 ```scala
 def numberOfPixels(image: JPEGImage): Int =  image.width * image.height
 ```
