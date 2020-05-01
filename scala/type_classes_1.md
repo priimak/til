@@ -71,7 +71,7 @@ def numberOfPixels[A](image: A)(implicit imageDimensions: ImageDimensions[A]): I
   imageDimensions.getDimensions(image).width * imageDimensions.getDimensions(image).height
 ```
 At the first glance it appears that you can pass any object `A` into this method. That, however, is 
-not the case! You only pass instances of class `A` for which there exist in the implicit scope
+not the case! You can only pass instances of class `A` for which there exist in the implicit scope
 an object or a value of type `ImageDimensions[A]`. In our case only instances of 
 `JPEGImage` or `TIFFImage` will be accepted by this method. Thus we can now do
 ```scala
