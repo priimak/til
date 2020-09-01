@@ -7,3 +7,4 @@
 #### Scala
 
 * [Type Classes](scala/type_classes_1.md)
+* [Magnet Pattern](scala/magnet_pattern.md)
