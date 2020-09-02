@@ -4,17 +4,16 @@ Magnet Pattern
 Motivation
 ----------
 
-Consider a case where we have a certain parametrized type, and we wish to pass object of that type to a
-a function where only certain parameter types are acceptable. Normally this is impossible ensure at 
+Consider a case where we have a certain parametrized type and we wish to pass object of that type to a
+function where only certain parameter types are acceptable. Normally this is impossible to ensure at 
 compile time due to a type erasure in Java and by proxy in Scala [1]. For example, let say we would 
-like to have a function `count(...)` that accepts either list of integers of strings and in the first
-case returns sum of all integers in the list and in second case sum of length of each string. We can
-try do define these functions like so:
+like to have a function `count(...)` that accepts either list of integers or list of strings and in 
+the first case returns sum of all integers in the list and in second case sum of length of each 
+string. We can try do define these functions like so:
 ```scala
 def count(strings: List[String]): Int = strings.map(_.length).sum
 def count(strings: List[Int]): Int = strings.sum
 ```
-
 Attempt to compile this code, however, will lead to an error
 ```
 Error:(3, 9) double definition:
@@ -54,7 +53,7 @@ Define a single function
 def count(countingMagnet: CountingMagnet): Int = countingMagnet()
 ```
 And provide two implicit functions that can create instance of `CountingMagnet` from either 
-of the two types `List[String]` and `List[Int]`.
+of these two types `List[String]` and `List[Int]`.
 ```scala
 implicit def counterOverListOfStrings(strings: List[String]) = new CountingMagnet {
   override def apply(): Int = strings.map(_.length).sum
@@ -64,7 +63,7 @@ implicit def counterOverListOfInts(ints: List[Int]) = new CountingMagnet {
   override def apply(): Int = ints.sum
 }
 ```
-When this two functions are in scope we can do calls
+When these two functions are in scope we can do calls
 ```scala
 count(List("hello", "world!"))
 count(List(1, 2, 3))
@@ -73,6 +72,7 @@ We, however, will not be able to compile code
 ```scala
 count(List(List(), List()))
 ```
+since there is no implicit conversion from `List[List[Any]]` to `CountingMagnet`.
 If in this case we wish to simply count of number of lists then we can do so by creating new 
 implicit function
 ```scala
@@ -80,6 +80,10 @@ implicit def counterOverListOfLists(ints: List[List[Any]]) = new CountingMagnet 
   override def apply(): Int = ints.map(_.length).sum
 }
 ```
+One obvious disadvantage of this pattern is that it is impossible to understand what types are 
+acceptable when calling `count(...)` just by looking at the function signature. To know that one
+needs to know exactly what implicit function are in scope that can coerce specific types into
+`CountingMagnet`. 
 
 References
 ----------
