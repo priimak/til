@@ -68,7 +68,7 @@ When these two functions are in scope we can do calls
 count(List("hello", "world!"))
 count(List(1, 2, 3))
 ```
-We, however, will not be able to compile code
+We, however, will not be able to compile following code
 ```scala
 count(List(List(), List()))
 ```
