@@ -8,3 +8,4 @@
 
 * [Type Classes](scala/type_classes_1.md)
 * [Magnet Pattern](scala/magnet_pattern.md)
+* [Structural Types vs Typeclasses](scala/structural_types_vs_typeclasses.md)
